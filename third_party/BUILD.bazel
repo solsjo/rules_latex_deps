@@ -13,7 +13,7 @@ configure_make(
     }),
     targets = [
         "so",
-        "soinstall",
+        "soinstall"
     ],
     visibility = ["//visibility:public"],
 )

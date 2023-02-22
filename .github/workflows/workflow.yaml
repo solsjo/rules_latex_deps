@@ -30,8 +30,8 @@ jobs:
           - ubuntu-22.04
           - ubuntu-20.04
           - ubuntu-18.04
+          - macos-latest
 
-          #- macos-latest
     needs: create-release
     runs-on: ${{ matrix.platform }}
       
@@ -44,25 +44,21 @@ jobs:
         with:
           path: "~/.cache/bazel"
           key: bazel
-      - name: install_potential_build_deps
+      - name: build_for_macosx
+        if: ${{matrix.platform == 'macos-latest'}}
         run: |
-            sudo apt-get install -qq autotools-dev autoconf-archive pkg-config libz-dev unzip
+            brew install automake
+            ./download_and_build_libgs_macos.sh \
+              https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs9561/ghostpdl-9.56.1.tar.gz \
+              rules_latex_deps_${{ matrix.platform }}.zip
       - name: build libgs on ${{ matrix.platform }}
+        if: ${{matrix.platform != 'macos-latest'}}
         shell: bash
         run: |
-            mkdir -p ghostscript_${{ matrix.platform }}
-            wget -O ghostscript_${{ matrix.platform }}/ghostscript_${{ matrix.platform }}.tar.gz https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs926/ghostpdl-9.26.tar.gz
-            cd ghostscript_${{ matrix.platform }}
-            tar -xf ghostscript_${{ matrix.platform }}.tar.gz
-            cd ghostpdl-9.26
-            autoreconf -fi
-            ./configure
-            make so
-            cd sobin
-            cp libgs.so.9.26 ../../../libgs.so.9.26
-            cd ../../..
-            zip rules_latex_deps_${{ matrix.platform }}.zip libgs.so.9.26
-
+            bazelisk build //third_party:lib_ghost_script_configure_linux
+            mkdir ./libgs
+            cp bazel-bin/third_party/lib_ghost_script_configure_linux/lib/libgs.* ./libgs/
+            zip rules_latex_deps_${{ matrix.platform }}.zip ./libgs/libgs.*
       - name: Archive artifacts
         uses: actions/upload-artifact@v3
         with:
