@@ -27,9 +27,9 @@ jobs:
     strategy:
       matrix:
         platform:
-          - ubuntu-22.04
-          - ubuntu-20.04
-          - ubuntu-18.04
+          #- ubuntu-22.04
+          #- ubuntu-20.04
+          #- ubuntu-18.04
           - macos-latest
 
     needs: create-release
@@ -47,18 +47,24 @@ jobs:
       - name: build_for_macosx
         if: ${{matrix.platform == 'macos-latest'}}
         run: |
-            brew install automake
-            ./download_and_build_libgs_macos.sh \
-              https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs9561/ghostpdl-9.56.1.tar.gz \
-              rules_latex_deps_${{ matrix.platform }}.zip
+            #brew install automake
+            #./download_and_build_libgs_macos.sh \
+            #  https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs9561/ghostpdl-9.56.1.tar.gz \
+            #  rules_latex_deps_${{ matrix.platform }}.zip
+            #brew search ghostscript
+            #brew install ghostscript
+            ls /usr/local/Cellar/ghostscript/10.0.0/share/libgs.dylib
+            ls /usr/local/Cellar/ghostscript/10.0.0/lib/libgs.dylib
       - name: build libgs on ${{ matrix.platform }}
         if: ${{matrix.platform != 'macos-latest'}}
         shell: bash
         run: |
-            bazelisk build //third_party:lib_ghost_script_configure_linux
-            mkdir ./libgs
-            cp bazel-bin/third_party/lib_ghost_script_configure_linux/lib/libgs.* ./libgs/
+            #bazelisk build //third_party:lib_ghost_script_configure_linux
+            #mkdir ./libgs
+            #cp bazel-bin/third_party/lib_ghost_script_configure_linux/lib/libgs.* ./libgs/
+            touch ./libgs/libgs.so
             zip rules_latex_deps_${{ matrix.platform }}.zip ./libgs/libgs.*
+            echo "temp test"
       - name: Archive artifacts
         uses: actions/upload-artifact@v3
         with:
