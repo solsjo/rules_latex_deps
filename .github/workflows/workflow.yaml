@@ -53,8 +53,12 @@ jobs:
             #  rules_latex_deps_${{ matrix.platform }}.zip
             #brew search ghostscript
             #brew install ghostscript
-            ls /usr/local/Cellar/ghostscript/10.0.0/share/libgs.dylib
-            ls /usr/local/Cellar/ghostscript/10.0.0/lib/libgs.dylib
+            #ls /usr/local/Cellar/ghostscript/10.0.0/share/libgs.dylib
+            #ls /usr/local/Cellar/ghostscript/10.0.0/lib/libgs.dylib
+            which python
+            which python3
+            python --version
+            realpath $(which python)
       - name: build libgs on ${{ matrix.platform }}
         if: ${{matrix.platform != 'macos-latest'}}
         shell: bash
